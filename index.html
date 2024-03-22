@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>String Replacer</title>
+
+  <style>
+    :root {
+      --color-accent: #895ede;
+      --color-border: #d9d9dd;
+      --color-text: #45435b;
+      --color-outline: #dfd3f6;
+      --border-component: 2px solid var(--color-border);
+    }
+
+    body {
+      background-color: #f9f9fa;
+    }
+    
+    .app {
+      max-width: 980px;
+      margin: 20px auto;
+      font-family: Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
+      padding: 15px;
+      font-weight: normal;
+      color: var(--color-text);
+    }
+
+    .button {
+      box-sizing: border-box;
+      padding: 1em 1em;
+      min-width: 250px;
+      border: none;
+      border-radius: 5px;
+      background-color: var(--color-accent);
+      font: inherit;
+      color: #fff;
+      box-shadow: 0 3px 2px 0 #5d3d9c;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    #replace-button {
+      align-self: center;
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .label {
+      display: flex;
+      flex-direction: column;
+      font-weight: 700;
+      gap: 5px;
+    }
+
+    .textarea {
+      min-height: 150px;
+      border: var(--border-component);
+      border-radius: 5px;
+      padding: 8px;
+      resize: vertical;
+      font: inherit;
+      font-weight: 400;
+    }
+
+    *:focus-visible {
+      border-color: var(--color-accent);
+      outline-color: var(--color-outline);
+      outline-width: 4px;
+      outline-style: solid;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <form id="replace-form" class="form">
+      <label class="label">
+        <span class="label__text">Replacement Table</span>
+        <textarea class="label__field textarea" id="replacements" required 
+          placeholder="a => b&#10;c,d => e">
+          и => і
+          г => ґ</textarea>
+      </label>
+
+      <label class="label">
+        <span class="label__text">Input</span>
+        <textarea class="label__field textarea" id="input" required>
+          29. (Четверг) Кришна Панчами. 151-й благословенный праздник явления основателя Шри Чайтанья Матха и всех мировых Гаудия Матхов, Бхагавана Шри Шрилы Бхактисиддханты Сарасвати Госвами Прабхупады. Годовщина установления Шри Гупта Говардхана, Шри Мандира, Шри Говинда Кунды в Навадвипе. День ухода Шрилы Пурушоттама Тхакура.
+        </textarea>
+      </label>
+
+      <button class="button" id="replace-button" type="submit">
+        Replace
+      </button>
+
+      <label class="label">
+        <span class="label__text">Output</span>
+        <textarea class="label__field textarea" id="output"></textarea>
+      </label>
+
+    </form>
+  </div>
+
+  <script>
+    const replaceButton = document.querySelector('#replace-button');
+    const form = document.querySelector('#replace-form');
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const replacementArea = document.querySelector('#replacements');
+      const lines = replacementArea.value.trim().split('\n');
+
+      const replacements = {};
+      lines.forEach((line) => {
+        const [targetString, replaceString] = line.split('=>');
+        if (targetString.includes(',')) {
+          const aliaces = targetString.split(',');
+          aliaces.forEach((alias) => {
+            replacements[alias.trim()] = replaceString.trim();
+          })
+        } else {
+          replacements[targetString.trim()] = replaceString.trim();
+        }
+      });
+
+      const inputArea = document.querySelector('#input');
+
+      const result = replaceText(inputArea.value, replacements);
+
+      const outputArea = document.querySelector('#output');
+      outputArea.value = result;
+    });
+
+    function replaceText(inputText, replacements) {
+      const regex = new RegExp(Object.keys(replacements).join("|"), "gi");
+      const replacedText = inputText.replace(regex, match => replacements[match.toLowerCase()]);
+
+      return replacedText;
+    }
+
+  </script>
+</body>
+
+</html>
